@@ -1,0 +1,55 @@
+#DEPENDENCIES: tensorflow, tensorflow-gpu, matplotlib, tensorflow-datasets, ipywidgets
+!pip install tensorflow tensorflow-gpu matplotlib tensorflow-datasets ipywidgets
+import tensorflow as tf
+gpus = tf.config.experimental.list_physical_devices('GPU')
+for gpu in gpus: 
+    tf.config.experimental.set_memory_growth(gpu, True)
+import tensorflow_datasets as tfds
+from matplotlib import pyplot as plt
+ds = tfds.load('fashion_mnist', split='train')
+ds.as_numpy_iterator().next()['label']
+#build the dataset  
+import numpy as np
+dataiterator = ds.as_numpy_iterator()
+dataiterator.next()['image']
+fig, ax = plt.subplots(ncols=4, figsize=(20,20))
+for idx in range(4): 
+    sample = dataiterator.next()
+    ax[idx].imshow(np.squeeze(sample['image']))
+    ax[idx].title.set_text(sample['label'])
+def scale_images(data): 
+    image = data['image']
+    return image / 255
+ds = tfds.load('fashion_mnist', split='train')
+ds = ds.map(scale_images) 
+ds = ds.cache()
+ds = ds.shuffle(60000)
+ds = ds.batch(128)
+ds = ds.prefetch(64)
+ds.as_numpy_iterator().next().shape
+#Build the CNN model
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, Dense, Flatten, Reshape, LeakyReLU, Dropout, UpSampling2D
+#Build the generator
+def build_generator(): 
+    model = Sequential()
+        # Beginnings of a generated image
+    model.add(Dense(7*7*128, input_dim=128))
+    model.add(LeakyReLU(0.2))
+    model.add(Reshape((7,7,128)))
+    
+    model.add(UpSampling2D())
+    model.add(Conv2D(128, 5, padding='same'))
+    model.add(LeakyReLU(0.2))
+    
+    model.add(UpSampling2D())
+    model.add(Conv2D(128, 5, padding='same'))
+    model.add(LeakyReLU(0.2))
+
+    model.add(Conv2D(128, 4, padding='same'))
+    model.add(LeakyReLU(0.2))
+    
+    model.add(Conv2D(128, 4, padding='same'))
+    model.add(LeakyReLU(0.2))
+ 
+    model.add(Conv2D(1, 4, padding='same', activation='sigmoid'))
