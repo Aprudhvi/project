@@ -7,8 +7,8 @@ for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True) # restricts memory gowth 
 import tensorflow_datasets as tfds
 from matplotlib import pyplot as plt
-ds = tfds.load('fashion_mnist', split='train')
-ds.as_numpy_iterator().next()['label']
+ds = tfds.load('fashion_mnist', split='train')  # ds is prefetch component ....split is used to split the dataset
+ds.as_numpy_iterator().next()['label']  
 #build the dataset  
 import numpy as np
 dataiterator = ds.as_numpy_iterator()
