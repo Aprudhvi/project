@@ -26,7 +26,7 @@ ds = ds.map(scale_images)
 ds = ds.cache()
 ds = ds.shuffle(60000)
 ds = ds.batch(128)
-ds = ds.prefetch(64)
+ds = ds.prefetch(64)  # to avoide bottlenecking and improve performance
 ds.as_numpy_iterator().next().shape
 #Build the CNN model
 from tensorflow.keras.models import Sequential
